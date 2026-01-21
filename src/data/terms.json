@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "term": "Soil pH",
+    "definition": "A measure of the acidity or alkalinity of the soil.",
+    "description": "Soil pH is a master variable in soil science that affects the availability of nutrients, microbial activity, and plant growth. It ranges from 0 to 14, with 7 being neutral.",
+    "category": "Soil",
+    "formula": "pH = -\\log[H^+]"
+  },
+  {
+    "id": 2,
+    "term": "Porosity",
+    "definition": "The volume of open spaces (pores) in a material.",
+    "description": "In soil science, porosity determines the water-holding capacity and aeration of the soil. It is inversely related to bulk density.",
+    "category": "Soil",
+    "formula": "f = 1 - \\frac{\\rho_b}{\\rho_p}"
+  },
+  {
+    "id": 3,
+    "term": "Biochemical Oxygen Demand (BOD)",
+    "definition": "The amount of dissolved oxygen needed by aerobic biological organisms to break down organic material.",
+    "description": "BOD is a critical metric in water quality management. High BOD indicates high levels of organic pollution, which can deplete oxygen and harm aquatic life.",
+    "category": "Water",
+    "formula": "BOD_t = D_0 - D_t"
+  },
+  {
+    "id": 4,
+    "term": "Hydraulic Conductivity",
+    "definition": "A property of vascular plants, soils and rocks, that describes the ease with which a fluid (usually water) can move through pore spaces or fractures.",
+    "description": "It depends on the intrinsic permeability of the material and the degree of saturation, and on the density and viscosity of the fluid.",
+    "category": "Water",
+    "formula": "K = \\frac{Q \\cdot L}{A \\cdot \\Delta h}"
+  },
+  {
+    "id": 5,
+    "term": "Eutrophication",
+    "definition": "Excessive richness of nutrients in a lake or other body of water.",
+    "description": "Frequently due to runoff from the land, which causes a dense growth of plant life and death of animal life from lack of oxygen.",
+    "category": "Environment",
+    "formula": null
+  },
+  {
+    "id": 6,
+    "term": "Cation Exchange Capacity (CEC)",
+    "definition": "The total capacity of a soil to hold exchangeable cations.",
+    "description": "CEC is an inherent soil characteristic and is difficult to alter significantly. It influences the soil's ability to hold onto essential nutrients and provides a buffer against soil acidification.",
+    "category": "Soil",
+    "formula": "CEC = \\sum \\text{Exchangeable Cations}"
+  },
+  {
+    "id": 7,
+    "term": "Darcy's Law",
+    "definition": "An equation that describes the flow of a fluid through a porous medium.",
+    "description": "Investigated by Henry Darcy, it is a foundation of hydrogeology.",
+    "category": "Water",
+    "formula": "Q = -KA \\frac{dh}{dl}"
+  },
+  {
+    "id": 8,
+    "term": "Photosynthesis",
+    "definition": "Process by which plants use sunlight, water, and carbon dioxide to create oxygen and energy.",
+    "description": "Crucial for life on Earth.",
+    "category": "Environment",
+    "formula": "6CO_2 + 6H_2O + light \\rightarrow C_6H_{12}O_6 + 6O_2"
+  },
+  {
+    "term": "Bulk Density",
+    "definition": "mass of soil solid over total volume of soil",
+    "description": "",
+    "category": "Soil",
+    "formula": "rho_b = (mass of soil solid / total volume of soil)",
+    "id": 9
+  }
+]

@@ -1,0 +1,247 @@
+[
+    {
+        "term": "Soil Porosity",
+        "category": "Soil",
+        "definition": "The fraction of the total soil volume that is taken up by the pore space.",
+        "description": "It is a critical property affecting the movement of air and water in the soil.",
+        "formula": "f = 1 - \\frac{\\rho_b}{\\rho_p}"
+    },
+    {
+        "term": "Volumetric Water Content",
+        "category": "Soil",
+        "definition": "The ratio of water volume to soil volume.",
+        "description": "Used to describe the amount of water stored in the soil profile.",
+        "formula": "\\theta_v = \\frac{V_w}{V_t}"
+    },
+    {
+        "term": "Gravimetric Water Content",
+        "category": "Soil",
+        "definition": "The mass of water per unit mass of dry soil.",
+        "description": "Standard method for measuring soil moisture in the lab.",
+        "formula": "\\theta_g = \\frac{M_w}{M_s}"
+    },
+    {
+        "term": "Darcy's Law (Flux)",
+        "category": "Water",
+        "definition": "Describes the flow of a fluid through a porous medium.",
+        "description": "Fundamental equation for groundwater flow.",
+        "formula": "q = -K \\frac{dh}{dl}"
+    },
+    {
+        "term": "Stokes' Law",
+        "category": "Soil",
+        "definition": "Calculates the settling velocity of particles in suspension.",
+        "description": "Used in particle size analysis (texture) of soils.",
+        "formula": "v = \\frac{2r^2g(\\rho_s - \\rho_l)}{9\\eta}"
+    },
+    {
+        "term": "Universal Soil Loss Equation (USLE)",
+        "category": "Environment",
+        "definition": "Predicts the long-term average annual rate of erosion on a field slope.",
+        "description": "Widely used model for soil conservation planning.",
+        "formula": "A = R \\cdot K \\cdot LS \\cdot C \\cdot P"
+    },
+    {
+        "term": "Sodium Adsorption Ratio (SAR)",
+        "category": "Water",
+        "definition": "A measure of the suitability of water for use in agricultural irrigation.",
+        "description": "Predicts sodium hazard.",
+        "formula": "SAR = \\frac{[Na^+]}{\\sqrt{\\frac{[Ca^{2+}] + [Mg^{2+}]}{2}}}"
+    },
+    {
+        "term": "Base Saturation",
+        "category": "Soil",
+        "definition": "The percentage of the CEC occupied by basic cations.",
+        "description": "Indicates soil fertility.",
+        "formula": "BS = \\frac{\\Sigma \\text{Bases}}{CEC} \\times 100"
+    },
+    {
+        "term": "Review of Respiration",
+        "category": "Environment",
+        "definition": "Metabolic process of organisms producing energy.",
+        "description": "Specific to soil microbes.",
+        "formula": "C_6H_{12}O_6 + 6O_2 \\rightarrow 6CO_2 + 6H_2O + \\text{Energy}"
+    },
+    {
+        "term": "Hydraulic Gradient",
+        "category": "Water",
+        "definition": "The change in total head with a change in distance in a given direction.",
+        "description": "Driving force for water movement.",
+        "formula": "i = \\frac{dh}{dl}"
+    },
+    {
+        "term": "Void Ratio",
+        "category": "Soil",
+        "definition": "The ratio of the volume of voids to the volume of solids.",
+        "description": "Used in soil mechanics.",
+        "formula": "e = \\frac{V_v}{V_s}"
+    },
+    {
+        "term": "Degree of Saturation",
+        "category": "Soil",
+        "definition": "The ratio of the volume of water to the volume of voids.",
+        "description": "Indicates how wet the soil is.",
+        "formula": "S = \\frac{V_w}{V_v} \\times 100"
+    },
+    {
+        "term": "Manning's Equation",
+        "category": "Water",
+        "definition": "Empirical formula for open channel flow.",
+        "description": "Calculates velocity of water in channels.",
+        "formula": "V = \\frac{k}{n} R_h^{2/3} S^{1/2}"
+    },
+    {
+        "term": "Photosynthesis",
+        "category": "Environment",
+        "definition": "Process used by plants to convert light energy into chemical energy.",
+        "description": "Basis of primary production.",
+        "formula": "6CO_2 + 6H_2O + light \\rightarrow C_6H_{12}O_6 + 6O_2"
+    },
+    {
+        "term": "pH",
+        "category": "Water",
+        "definition": "A measure of acidity or alkalinity.",
+        "description": "Logarithmic scale of hydrogen ion concentration.",
+        "formula": "pH = -\\log[H^+]"
+    },
+    {
+        "term": "Hardness of Water",
+        "category": "Water",
+        "definition": "Combined content of calcium and magnesium.",
+        "description": "Affects soap lathering and scaling.",
+        "formula": "\\text{Hardness} \\approx 2.5[Ca^{2+}] + 4.1[Mg^{2+}]"
+    },
+    {
+        "term": "Albedo",
+        "category": "Environment",
+        "definition": "The proportion of the incident light or radiation that is reflected by a surface.",
+        "description": "Critical for energy balance.",
+        "formula": "\\alpha = \\frac{\\text{Reflected Radiation}}{\\text{Incident Radiation}}"
+    },
+    {
+        "term": "Beer-Lambert Law",
+        "category": "Environment",
+        "definition": "Relates the attenuation of light to the properties of the material through which the light is traveling.",
+        "description": "Used in identifying compounds.",
+        "formula": "A = \\epsilon l c"
+    },
+    {
+        "term": "Ideal Gas Law",
+        "category": "Environment",
+        "definition": "Equation of state of a hypothetical ideal gas.",
+        "description": "Approximation for behavior of many gases.",
+        "formula": "PV = nRT"
+    },
+    {
+        "term": "Carbon to Nitrogen Ratio",
+        "category": "Soil",
+        "definition": "Ratio of mass of carbon to mass of nitrogen in a substance.",
+        "description": "Determines decomposition rates.",
+        "formula": "C:N = \\frac{\\text{Mass of C}}{\\text{Mass of N}}"
+    },
+    {
+        "term": "Exchangeable Sodium Percentage (ESP)",
+        "category": "Soil",
+        "definition": "The percentage of the CEC occupied by sodium.",
+        "description": "Used to classify sodic soils.",
+        "formula": "ESP = \\frac{[Na^+]}{CEC} \\times 100"
+    },
+    {
+        "term": "Total Pore Space",
+        "category": "Soil",
+        "definition": "Volume of soil not occupied by solids.",
+        "description": "Same as porosity.",
+        "formula": "TPS = 100 - (\\frac{\\rho_b}{\\rho_p} \\times 100)"
+    },
+    {
+        "term": "Water Use Efficiency (WUE)",
+        "category": "Water",
+        "definition": "Yield of plant product per unit of crop water use.",
+        "description": "Metric for irrigation effectiveness.",
+        "formula": "WUE = \\frac{\\text{Yield}}{\\text{Eva-transpiration}}"
+    },
+    {
+        "term": "Reynolds Number",
+        "category": "Water",
+        "definition": "Dimensionless quantity predicting flow patterns.",
+        "description": "Laminar vs Turbulent flow.",
+        "formula": "Re = \\frac{\\rho u L}{\\mu}"
+    },
+    {
+        "term": "Apparent Specific Gravity",
+        "category": "Soil",
+        "definition": "Ratio of the weight of a volume of soil to the weight of an equal volume of water.",
+        "description": "Related to bulk density.",
+        "formula": "G_a = \\frac{\\rho_b}{\\rho_w}"
+    },
+    {
+        "term": "Linear Extensibility",
+        "category": "Soil",
+        "definition": "Percentage change in length of a soil sample upon wetting.",
+        "description": "Indicates shrink-swell potential.",
+        "formula": "LE = \\frac{L_{wet} - L_{dry}}{L_{dry}} \\times 100"
+    },
+    {
+        "term": "Ozone Formation",
+        "category": "Environment",
+        "definition": "Chemical reaction creating ozone in stratosphere.",
+        "description": "Chapman cycle.",
+        "formula": "O_2 + h\\nu \\rightarrow 2O"
+    },
+    {
+        "term": "Ammonia Volatilization",
+        "category": "Environment",
+        "definition": "Loss of nitrogen as ammonia gas.",
+        "description": "Occurs in high pH soils.",
+        "formula": "NH_4^+ + OH^- \\rightarrow NH_3 \\uparrow + H_2O"
+    },
+    {
+        "term": "Nitrification",
+        "category": "Soil",
+        "definition": "Biological oxidation of ammonia to nitrite followed by oxidation of nitrite to nitrate.",
+        "description": "Key step in N cycle.",
+        "formula": "2NH_4^+ + 3O_2 \\rightarrow 2NO_2^- + 4H^+ + 2H_2O"
+    },
+    {
+        "term": "Denitrification",
+        "category": "Soil",
+        "definition": "Microbial reduction of nitrate to nitrogen gas.",
+        "description": "Loss of N to atmosphere.",
+        "formula": "2NO_3^- \\rightarrow N_2 + 3O_2"
+    },
+    {
+        "term": "Rainfall Intensity",
+        "category": "Water",
+        "definition": "Depth of water falling per unit time.",
+        "description": "Parameter for erosion and runoff.",
+        "formula": "I = \\frac{P}{t}"
+    },
+    {
+        "term": "Runoff Coefficient",
+        "category": "Water",
+        "definition": "Ratio of runoff depth to precipitation depth.",
+        "description": "Used in Rational Method.",
+        "formula": "C = \\frac{R}{P}"
+    },
+    {
+        "term": "Rational Method",
+        "category": "Water",
+        "definition": "Estimates peak discharge from a small watershed.",
+        "description": "Simple hydrologic model.",
+        "formula": "Q = CiA"
+    },
+    {
+        "term": "Specific Surface Area",
+        "category": "Soil",
+        "definition": "Total surface area of soil particles per unit mass.",
+        "description": "High in clays.",
+        "formula": "SSA = \\frac{A_s}{M_s}"
+    },
+    {
+        "term": "Capillary Rise",
+        "category": "Water",
+        "definition": "Height to which water rises in a small pore.",
+        "description": "Against gravity.",
+        "formula": "h = \\frac{2T\\cos\\alpha}{r\\rho g}"
+    }
+]
