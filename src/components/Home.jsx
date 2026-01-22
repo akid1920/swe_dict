@@ -212,7 +212,6 @@ function Home() {
                                                         )}
                                                     </div>
                                                 )}
-                                                <div className="tod-source">Source: FAO</div> {/* Placeholder */}
                                             </div>
                                             <div className="tod-actions">
                                                 <button className="btn-view-full" onClick={() => setSelectedTerm(termOfDay)}>

@@ -331,6 +331,13 @@ body {
 .btn-view-full {
   background-color: #5d4037;
   color: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-view-full:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(93, 64, 55, 0.4);
 }
 
 .btn-save {
