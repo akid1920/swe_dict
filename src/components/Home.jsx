@@ -216,7 +216,7 @@ function Home() {
                                             </div>
                                             <div className="tod-actions">
                                                 <button className="btn-view-full" onClick={() => setSelectedTerm(termOfDay)}>
-                                                    <Bookmark size={16} /> Click for details
+                                                    Click for details
                                                 </button>
                                             </div>
                                         </div>
