@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const DB_FILE = path.join(__dirname, 'swes.db');
 const JSON_DATA_FILE = path.join(__dirname, 'src', 'data', 'terms.json');
 const ADMIN_PASSWORD = 'admin';
