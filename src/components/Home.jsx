@@ -142,24 +142,7 @@ function Home() {
             {!isLandingView && (
                 <button
                     onClick={clearFilters}
-                    style={{
-                        position: 'absolute',
-                        top: '1rem',
-                        left: '1rem',
-                        background: 'white',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '8px',
-                        padding: '0.5rem 1rem',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        color: 'var(--text-main)',
-                        fontSize: '0.9rem',
-                        fontWeight: '500',
-                        zIndex: 10,
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-                    }}
+                    className="back-button"
                 >
                     <ArrowRight size={16} style={{ transform: 'rotate(180deg)' }} /> Back
                 </button>
