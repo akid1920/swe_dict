@@ -1,50 +1,48 @@
 # Deployment Guide: SWES Dictionary App
 
-This application is a **Node.js** app that serves a **React** frontend and uses **SQLite** for the database.
+This application is a **Node.js** app that serves a **React** frontend.
+- **Development**: Uses local SQLite (`swes.db`).
+- **Production**: Uses PostgreSQL (via Render).
 
 ## Prerequisites
 - **GitHub Account**: To host your code.
-- **Render.com Account** (or Railway/DigitalOcean): To host the app.
+- **Render.com Account**: To host the app.
 
-## Important Note on Database
-This app uses **SQLite** (`swes.db`). SQLite acts like a file.
-- **Ephemeral Hosting (e.g., Vercel, Netlify, Heroku Free Tier)**: These services **wipe the disk** every time you deploy or restart. Your data will be lost.
-- **Persistent Hosting (Recommended)**: You need a service that supports **Persistent Disks** (Volumes), such as **Render (with Disk)**, **Railway (with Volume)**, or a **VPS** (DigitalOcean Droplet).
+## 1. Deploy to Render (Recommended)
 
-## Option A: Deploy to Render.com (Recommended)
-
-1.  **Push Code to GitHub**:
-    - Commit all your changes (including `swes.db` if you want to keep your current data, or let it auto-create a fresh one).
-    - Push to a new GitHub repository.
-
+1.  **Push Code to GitHub**.
 2.  **Create Web Service on Render**:
-    - New -> Web Service.
     - Connect your GitHub repo.
-
-3.  **Configure**:
-    - **Name**: `swes-dictionary`
-    - **Environment**: `Node`
     - **Build Command**: `npm install && npm run build`
     - **Start Command**: `node server.js`
+3.  **Add Database**:
+    - Create a **PostgreSQL** database on Render.
+    - Copy the **Internal Database URL**.
+    - In your Web Service settings -> **Environment**, add:
+        - Key: `DATABASE_URL`
+        - Value: `(Paste your Internal Database URL)`
 
-4.  **Add Persistent Disk (Crucial)**:
-    - Go to **Disks** section in setup.
-    - Name: `sqlite-data`
-    - Mount Path: `/opt/render/project/src` (or simply `./` depending on how Render mounts it, usually project root).
-    - *Note: Render's free tier does not support disks. You may need the paid "Starter" plan for persistence, or use a cloud database service like PostgreSQL instead of SQLite for free tier hosting.*
+## 2. Accessing the Database (pgAdmin)
 
-## Option B: Run Locally (Forever)
+To view or edit your live data using a tool like **pgAdmin** or **DBeaver**:
 
-If this is for a local kiosk or office computer:
-1.  Install **Node.js**.
-2.  Copy the project folder.
-3.  Run `npm install && npm run build`.
-4.  Start with `node server.js`.
-5.  Access at `http://localhost:3000`.
+1.  **Get External Connection Info**:
+    - Go to Render Dashboard -> Select your **PostgreSQL** service.
+    - Click **Connect** (top right) -> **External Connection**.
+    - Copy the **External Database URL** (starts with `postgresql://...`).
+    - *Note: Don't use the Internal URL; it only works within Render's cloud.*
 
-## Option C: VPS (Digital Ocean / AWS)
+2.  **Configure pgAdmin**:
+    - Right-click "Servers" -> Register -> Server.
+    - **General Tab**: Name it `SWES Project`.
+    - **Connection Tab**:
+        - **Host name/address**: The part of the URL after `@` and before the next `/` (e.g., `dpg-xyz-a.oregon-postgres.render.com`).
+        - **Port**: `5432`
+        - **Maintenance database**: `project_swe` (the name at the end of the URL).
+        - **Username**: `project_swe_user` (from the URL).
+        - **Password**: The long string in the URL (between `:` and `@`).
+    - Click **Save**.
 
-1.  SSH into server.
-2.  Clone repo.
-3.  `npm install && npm run build`.
-4.  Use `pm2` to keep it running: `pm2 start server.js`.
+## 3. Local Development
+- Run `npm run dev` and `npm run server`.
+- It will automatically use the local `swes.db` file.
