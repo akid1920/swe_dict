@@ -1,90 +1,51 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import sqlite3 from 'sqlite3';
+import db from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DB_FILE = path.join(__dirname, 'swes.db');
 const JSON_DATA_FILE = path.join(__dirname, 'src', 'data', 'terms.json');
 const ADMIN_PASSWORD = 'admin';
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
 
-// Initialize & Connect to Database
-const db = new sqlite3.Database(DB_FILE, (err) => {
-    if (err) {
-        console.error('Could not connect to database', err);
-    } else {
-        console.log('Connected to SQLite database');
-        initDb();
+// Initialize Database
+db.init().then(async () => {
+    // Auto-Migration: Check if empty
+    try {
+        const row = await db.get("SELECT count(*) as count FROM terms");
+        if (row && (row.count === 0 || row.count === '0')) {
+            console.log("Database empty. Migrating from JSON...");
+            migrateJsonData();
+        }
+    } catch (e) {
+        console.error("Error checking db count", e);
     }
 });
 
-function initDb() {
-    db.serialize(() => {
-        // Create Table
-        db.run(`CREATE TABLE IF NOT EXISTS terms (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      term TEXT,
-      definition TEXT,
-      description TEXT,
-      category TEXT,
-      formula TEXT,
-      formula_description TEXT
-    )`, (err) => {
-            if (err) {
-                console.error("Error creating table", err);
-                return;
-            }
-
-            // Migration: Add formula_description column if missing (for existing dbs)
-            db.all("PRAGMA table_info(terms)", (err, rows) => {
-                if (!err) {
-                    const hasCol = rows.some(r => r.name === 'formula_description');
-                    if (!hasCol) {
-                        console.log("Migrating: Adding formula_description column...");
-                        db.run("ALTER TABLE terms ADD COLUMN formula_description TEXT", (err) => {
-                            if (err) console.error("Migration failed:", err);
-                        });
-                    }
-                }
-            });
-
-            // Auto-Migration: Check if empty
-            db.get("SELECT count(*) as count FROM terms", (err, row) => {
-                if (!err && row.count === 0) {
-                    console.log("Database empty. Migrating from JSON...");
-                    migrateJsonData();
-                }
-            });
-        });
-    });
-}
-
-function migrateJsonData() {
+async function migrateJsonData() {
     if (fs.existsSync(JSON_DATA_FILE)) {
         try {
             const rawData = fs.readFileSync(JSON_DATA_FILE, 'utf8');
             const terms = JSON.parse(rawData);
 
             if (Array.isArray(terms) && terms.length > 0) {
-                const stmt = db.prepare("INSERT INTO terms (term, definition, description, category, formula, formula_description) VALUES (?, ?, ?, ?, ?, ?)");
-
-                db.serialize(() => {
-                    terms.forEach(term => {
-                        stmt.run(term.term, term.definition, term.description, term.category, term.formula, term.formula_description || '');
-                    });
-                    stmt.finalize();
-                    console.log(`Migrated ${terms.length} terms to SQLite.`);
-                });
+                for (const term of terms) {
+                    await db.run(
+                        "INSERT INTO terms (term, definition, description, category, formula, formula_description) VALUES (?, ?, ?, ?, ?, ?)",
+                        [term.term, term.definition, term.description, term.category, term.formula, term.formula_description || '']
+                    );
+                }
+                console.log(`Migrated ${terms.length} terms to database.`);
             }
         } catch (e) {
             console.error("Migration failed:", e);
@@ -105,34 +66,35 @@ const checkAuth = (req, res, next) => {
 // --- API Endpoints ---
 
 // GET terms
-app.get('/api/terms', (req, res) => {
-    db.all("SELECT * FROM terms ORDER BY term ASC", [], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
+app.get('/api/terms', async (req, res) => {
+    try {
+        const rows = await db.all("SELECT * FROM terms ORDER BY term ASC");
         res.json(rows);
-    });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // POST new term
-app.post('/api/terms', checkAuth, (req, res) => {
+app.post('/api/terms', checkAuth, async (req, res) => {
     const { term, definition, description, category, formula, formula_description } = req.body;
     if (!term || !definition) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const stmt = db.prepare("INSERT INTO terms (term, definition, description, category, formula, formula_description) VALUES (?, ?, ?, ?, ?, ?)");
-    stmt.run(term, definition, description, category, formula, formula_description, function (err) {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.json({ id: this.lastID, term, definition, description, category, formula, formula_description });
-    });
-    stmt.finalize();
+    try {
+        const result = await db.run(
+            "INSERT INTO terms (term, definition, description, category, formula, formula_description) VALUES (?, ?, ?, ?, ?, ?)",
+            [term, definition, description, category, formula, formula_description]
+        );
+        res.json({ id: result.id, term, definition, description, category, formula, formula_description });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // PUT update term
-app.put('/api/terms/:id', checkAuth, (req, res) => {
+app.put('/api/terms/:id', checkAuth, async (req, res) => {
     const { id } = req.params;
     const { term, definition, description, category, formula, formula_description } = req.body;
 
@@ -140,63 +102,54 @@ app.put('/api/terms/:id', checkAuth, (req, res) => {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const stmt = db.prepare(`
-        UPDATE terms 
-        SET term = ?, definition = ?, description = ?, category = ?, formula = ?, formula_description = ?
-        WHERE id = ?
-    `);
+    try {
+        const result = await db.run(`
+            UPDATE terms 
+            SET term = ?, definition = ?, description = ?, category = ?, formula = ?, formula_description = ?
+            WHERE id = ?
+        `, [term, definition, description, category, formula, formula_description, id]);
 
-    stmt.run(term, definition, description, category, formula, formula_description, id, function (err) {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        if (this.changes === 0) {
+        if (result.changes === 0) {
             return res.status(404).json({ error: 'Term not found' });
         }
         res.json({ id, term, definition, description, category, formula, formula_description });
-    });
-    stmt.finalize();
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // POST import
-app.post('/api/import', checkAuth, (req, res) => {
+app.post('/api/import', checkAuth, async (req, res) => {
     const importedTerms = req.body;
     if (!Array.isArray(importedTerms)) {
         return res.status(400).json({ error: 'Input must be an array' });
     }
 
-    db.serialize(() => {
-        db.run("BEGIN TRANSACTION");
-        const stmt = db.prepare("INSERT INTO terms (term, definition, description, category, formula, formula_description) VALUES (?, ?, ?, ?, ?, ?)");
-
-        let errorOccurred = false;
-        importedTerms.forEach(t => {
-            stmt.run(t.term, t.definition, t.description, t.category, t.formula, t.formula_description || '', (err) => {
-                if (err) errorOccurred = true;
-            });
-        });
-
-        stmt.finalize(() => {
-            if (errorOccurred) {
-                db.run("ROLLBACK");
-                res.status(500).json({ error: 'Failed to import some terms' });
-            } else {
-                db.run("COMMIT");
-                res.json({ message: `Imported ${importedTerms.length} terms.` });
-            }
-        });
-    });
+    try {
+        let successCount = 0;
+        for (const t of importedTerms) {
+            await db.run(
+                "INSERT INTO terms (term, definition, description, category, formula, formula_description) VALUES (?, ?, ?, ?, ?, ?)",
+                [t.term, t.definition, t.description, t.category, t.formula, t.formula_description || '']
+            );
+            successCount++;
+        }
+        res.json({ message: `Imported ${successCount} terms.` });
+    } catch (err) {
+        console.error("Import error", err);
+        res.status(500).json({ error: 'Failed to import some terms' });
+    }
 });
 
 // DELETE term
-app.delete('/api/terms/:id', checkAuth, (req, res) => {
+app.delete('/api/terms/:id', checkAuth, async (req, res) => {
     const { id } = req.params;
-    db.run("DELETE FROM terms WHERE id = ?", id, function (err) {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.json({ message: 'Term deleted', changes: this.changes });
-    });
+    try {
+        const result = await db.run("DELETE FROM terms WHERE id = ?", [id]);
+        res.json({ message: 'Term deleted', changes: result.changes });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // LOGIN check
@@ -216,7 +169,6 @@ if (fs.existsSync(distPath)) {
     app.use(express.static(distPath));
 
     // Handle Client-side Routing (Catch-all)
-    // Using app.use() as the last middleware to catch unmatched requests
     app.use((req, res) => {
         res.sendFile(path.join(distPath, 'index.html'));
     });
