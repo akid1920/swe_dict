@@ -5,8 +5,9 @@ import * as XLSX from 'xlsx';
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const [newTerm, setNewTerm] = useState({
-        term: '', definition: '', description: '', category: 'Soil', formula: ''
+        term: '', definition: '', description: '', category: 'Soil', formula: '', formula_description: ''
     });
+    const [editingId, setEditingId] = useState(null);
     const [message, setMessage] = useState('');
     const [terms, setTerms] = useState([]);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -24,25 +25,48 @@ const AdminDashboard = () => {
             .catch(err => console.error("Failed to load terms", err));
     }, [refreshTrigger]);
 
-    const handleAdd = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('/api/terms', {
-                method: 'POST',
+            const url = editingId ? `/api/terms/${editingId}` : '/api/terms';
+            const method = editingId ? 'PUT' : 'POST';
+
+            const res = await fetch(url, {
+                method: method,
                 headers: getAuthHeaders(),
                 body: JSON.stringify(newTerm)
             });
+
             if (res.ok) {
-                setMessage('Term added successfully!');
-                setNewTerm({ term: '', definition: '', description: '', category: 'Soil', formula: '' });
+                setMessage(editingId ? 'Term updated successfully!' : 'Term added successfully!');
+                setNewTerm({ term: '', definition: '', description: '', category: 'Soil', formula: '', formula_description: '' });
+                setEditingId(null);
                 setRefreshTrigger(prev => prev + 1);
             } else {
-                setMessage('Failed to add term.');
+                setMessage('Failed to save term.');
             }
         } catch (err) {
             setMessage('Error connecting to server.');
         }
     };
+
+    const handleEdit = (term) => {
+        setNewTerm({
+            term: term.term,
+            definition: term.definition,
+            description: term.description || '',
+            category: term.category,
+            formula: term.formula || '',
+            formula_description: term.formula_description || ''
+        });
+        setEditingId(term.id);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    const cancelEdit = () => {
+        setNewTerm({ term: '', definition: '', description: '', category: 'Soil', formula: '', formula_description: '' });
+        setEditingId(null);
+    }
 
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this term?")) return;
@@ -140,8 +164,8 @@ const AdminDashboard = () => {
 
             {message && <div style={{
                 padding: '1rem',
-                background: message.includes('Success') || message.includes('success') || message.includes('deleted') ? '#dcfce7' : '#fee2e2',
-                color: message.includes('Success') || message.includes('success') || message.includes('deleted') ? '#166534' : '#991b1b',
+                background: message.includes('Success') || message.includes('success') || message.includes('deleted') || message.includes('updated') ? '#dcfce7' : '#fee2e2',
+                color: message.includes('Success') || message.includes('success') || message.includes('deleted') || message.includes('updated') ? '#166534' : '#991b1b',
                 borderRadius: 'var(--radius-md)',
                 marginBottom: '1rem'
             }}>
@@ -155,8 +179,16 @@ const AdminDashboard = () => {
                 boxShadow: 'var(--glass-shadow)',
                 marginBottom: '2rem'
             }}>
-                <h3 style={{ marginTop: 0 }}>Add New Term</h3>
-                <form onSubmit={handleAdd} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <h3 style={{ margin: 0 }}>{editingId ? 'Edit Term' : 'Add New Term'}</h3>
+                    {editingId && (
+                        <button onClick={cancelEdit} className="filter-btn" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}>
+                            Cancel Edit
+                        </button>
+                    )}
+                </div>
+
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <input
                         className="search-input"
                         placeholder="Term Name"
@@ -189,13 +221,24 @@ const AdminDashboard = () => {
                         value={newTerm.description}
                         onChange={e => setNewTerm({ ...newTerm, description: e.target.value })}
                     />
-                    <input
-                        className="search-input"
-                        placeholder="LaTeX Formula (Optional, e.g. E=mc^2)"
-                        value={newTerm.formula}
-                        onChange={e => setNewTerm({ ...newTerm, formula: e.target.value })}
-                    />
-                    <button type="submit" className="filter-btn active">Add Term</button>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <input
+                            className="search-input"
+                            placeholder="LaTeX Formula (e.g. E=mc^2)"
+                            value={newTerm.formula}
+                            onChange={e => setNewTerm({ ...newTerm, formula: e.target.value })}
+                        />
+                        <textarea
+                            className="search-input"
+                            placeholder="Formula Variables&#10;h = elevation [m]&#10;T = surface tension [Nm⁻¹]"
+                            rows="4"
+                            value={newTerm.formula_description}
+                            onChange={e => setNewTerm({ ...newTerm, formula_description: e.target.value })}
+                        />
+                    </div>
+                    <button type="submit" className="filter-btn active">
+                        {editingId ? 'Update Term' : 'Add Term'}
+                    </button>
                 </form>
             </div>
 
@@ -208,7 +251,7 @@ const AdminDashboard = () => {
             }}>
                 <h3 style={{ marginTop: 0 }}>Import Terms</h3>
                 <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>
-                    Upload a file (.csv, .xlsx, .json) with columns: Term, Definition, Description, Category, Formula.
+                    Upload a file (.csv, .xlsx, .json) with columns: Term, Definition, Description, Category, Formula, Formula Description.
                 </p>
                 <input
                     type="file"
@@ -231,7 +274,7 @@ const AdminDashboard = () => {
                             <tr style={{ textAlign: 'left', borderBottom: '1px solid #eee' }}>
                                 <th style={{ padding: '0.5rem' }}>Term</th>
                                 <th style={{ padding: '0.5rem' }}>Category</th>
-                                <th style={{ padding: '0.5rem' }}>Action</th>
+                                <th style={{ padding: '0.5rem', textAlign: 'right' }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -239,7 +282,21 @@ const AdminDashboard = () => {
                                 <tr key={t.id} style={{ borderBottom: '1px solid #fcfcfc' }}>
                                     <td style={{ padding: '0.5rem' }}>{t.term}</td>
                                     <td style={{ padding: '0.5rem' }}><span className="category-badge" style={{ fontSize: '0.7em' }}>{t.category}</span></td>
-                                    <td style={{ padding: '0.5rem' }}>
+                                    <td style={{ padding: '0.5rem', textAlign: 'right', display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                        <button
+                                            onClick={() => handleEdit(t)}
+                                            style={{
+                                                background: '#dbeafe',
+                                                color: '#1e40af',
+                                                padding: '0.2rem 0.5rem',
+                                                fontSize: '0.8rem',
+                                                borderRadius: '4px',
+                                                border: 'none',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            Edit
+                                        </button>
                                         <button
                                             onClick={() => handleDelete(t.id)}
                                             style={{
@@ -247,7 +304,9 @@ const AdminDashboard = () => {
                                                 color: '#991b1b',
                                                 padding: '0.2rem 0.5rem',
                                                 fontSize: '0.8rem',
-                                                borderRadius: '4px'
+                                                borderRadius: '4px',
+                                                border: 'none',
+                                                cursor: 'pointer'
                                             }}
                                         >
                                             Delete

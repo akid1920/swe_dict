@@ -37,12 +37,26 @@ function initDb() {
       definition TEXT,
       description TEXT,
       category TEXT,
-      formula TEXT
+      formula TEXT,
+      formula_description TEXT
     )`, (err) => {
             if (err) {
                 console.error("Error creating table", err);
                 return;
             }
+
+            // Migration: Add formula_description column if missing (for existing dbs)
+            db.all("PRAGMA table_info(terms)", (err, rows) => {
+                if (!err) {
+                    const hasCol = rows.some(r => r.name === 'formula_description');
+                    if (!hasCol) {
+                        console.log("Migrating: Adding formula_description column...");
+                        db.run("ALTER TABLE terms ADD COLUMN formula_description TEXT", (err) => {
+                            if (err) console.error("Migration failed:", err);
+                        });
+                    }
+                }
+            });
 
             // Auto-Migration: Check if empty
             db.get("SELECT count(*) as count FROM terms", (err, row) => {
@@ -62,11 +76,11 @@ function migrateJsonData() {
             const terms = JSON.parse(rawData);
 
             if (Array.isArray(terms) && terms.length > 0) {
-                const stmt = db.prepare("INSERT INTO terms (term, definition, description, category, formula) VALUES (?, ?, ?, ?, ?)");
+                const stmt = db.prepare("INSERT INTO terms (term, definition, description, category, formula, formula_description) VALUES (?, ?, ?, ?, ?, ?)");
 
                 db.serialize(() => {
                     terms.forEach(term => {
-                        stmt.run(term.term, term.definition, term.description, term.category, term.formula);
+                        stmt.run(term.term, term.definition, term.description, term.category, term.formula, term.formula_description || '');
                     });
                     stmt.finalize();
                     console.log(`Migrated ${terms.length} terms to SQLite.`);
@@ -102,17 +116,44 @@ app.get('/api/terms', (req, res) => {
 
 // POST new term
 app.post('/api/terms', checkAuth, (req, res) => {
-    const { term, definition, description, category, formula } = req.body;
+    const { term, definition, description, category, formula, formula_description } = req.body;
     if (!term || !definition) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const stmt = db.prepare("INSERT INTO terms (term, definition, description, category, formula) VALUES (?, ?, ?, ?, ?)");
-    stmt.run(term, definition, description, category, formula, function (err) {
+    const stmt = db.prepare("INSERT INTO terms (term, definition, description, category, formula, formula_description) VALUES (?, ?, ?, ?, ?, ?)");
+    stmt.run(term, definition, description, category, formula, formula_description, function (err) {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        res.json({ id: this.lastID, term, definition, description, category, formula });
+        res.json({ id: this.lastID, term, definition, description, category, formula, formula_description });
+    });
+    stmt.finalize();
+});
+
+// PUT update term
+app.put('/api/terms/:id', checkAuth, (req, res) => {
+    const { id } = req.params;
+    const { term, definition, description, category, formula, formula_description } = req.body;
+
+    if (!term || !definition) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const stmt = db.prepare(`
+        UPDATE terms 
+        SET term = ?, definition = ?, description = ?, category = ?, formula = ?, formula_description = ?
+        WHERE id = ?
+    `);
+
+    stmt.run(term, definition, description, category, formula, formula_description, id, function (err) {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Term not found' });
+        }
+        res.json({ id, term, definition, description, category, formula, formula_description });
     });
     stmt.finalize();
 });
@@ -126,11 +167,11 @@ app.post('/api/import', checkAuth, (req, res) => {
 
     db.serialize(() => {
         db.run("BEGIN TRANSACTION");
-        const stmt = db.prepare("INSERT INTO terms (term, definition, description, category, formula) VALUES (?, ?, ?, ?, ?)");
+        const stmt = db.prepare("INSERT INTO terms (term, definition, description, category, formula, formula_description) VALUES (?, ?, ?, ?, ?, ?)");
 
         let errorOccurred = false;
         importedTerms.forEach(t => {
-            stmt.run(t.term, t.definition, t.description, t.category, t.formula, (err) => {
+            stmt.run(t.term, t.definition, t.description, t.category, t.formula, t.formula_description || '', (err) => {
                 if (err) errorOccurred = true;
             });
         });

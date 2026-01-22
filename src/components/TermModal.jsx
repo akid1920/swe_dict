@@ -31,6 +31,18 @@ const TermModal = ({ term, onClose, relatedTerms, onSelectTerm }) => {
                             <h3>Formula</h3>
                             <div className="formula-container">
                                 <BlockMath>{term.formula}</BlockMath>
+                                {term.formula_description && (
+                                    <div style={{ marginTop: '1rem', textAlign: 'left', fontSize: '0.9rem', color: 'var(--text-main)' }}>
+                                        <div style={{ fontStyle: 'italic', fontWeight: 'bold', marginBottom: '0.25rem' }}>Where</div>
+                                        <div style={{ paddingLeft: '1.5rem' }}>
+                                            {term.formula_description.split('\n').map((line, i) => (
+                                                <div key={i} style={{ marginBottom: '0.1rem' }}>
+                                                    {line}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
