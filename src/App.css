@@ -18,6 +18,19 @@
   letter-spacing: -0.05em;
 }
 
+.site-logo {
+  max-width: 180px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  transition: all 0.3s ease;
+}
+
+.hero-compact .site-logo {
+  max-width: 120px;
+  margin-bottom: 1rem;
+}
+
 .app-subtitle {
   color: var(--text-muted);
   font-size: 1.1rem;
