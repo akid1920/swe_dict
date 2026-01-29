@@ -30,6 +30,8 @@ db.init().then(async () => {
     } catch (e) {
         console.error("Error checking db count", e);
     }
+}).catch(err => {
+    console.error("CRITICAL: Database initialization failed", err);
 });
 
 async function migrateJsonData() {
