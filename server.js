@@ -66,6 +66,9 @@ const checkAuth = (req, res, next) => {
 };
 
 // --- API Endpoints ---
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', db: isPostgres ? 'postgres' : 'sqlite' });
+});
 
 // GET terms
 app.get('/api/terms', async (req, res) => {

@@ -3,11 +3,14 @@ import { useNavigate } from 'react-router-dom';
 
 const AdminLogin = () => {
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setError('');
+
         try {
             const res = await fetch('/api/login', {
                 method: 'POST',
@@ -24,7 +27,10 @@ const AdminLogin = () => {
                 setError(`Server Error: ${res.status}`);
             }
         } catch (err) {
-            setError('Network Error or Server Unreachable');
+            console.error(err);
+            setError('Network Error. Check console.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -64,10 +70,11 @@ const AdminLogin = () => {
                     {error && <p style={{ color: 'red', marginTop: '-0.5rem' }}>{error}</p>}
                     <button
                         type="submit"
+                        disabled={loading}
                         className="filter-btn active"
-                        style={{ width: '100%', justifyContent: 'center' }}
+                        style={{ width: '100%', justifyContent: 'center', opacity: loading ? 0.7 : 1 }}
                     >
-                        Login
+                        {loading ? 'Verifying...' : 'Login'}
                     </button>
                 </form>
             </div>
