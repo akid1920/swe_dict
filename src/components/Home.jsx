@@ -26,8 +26,16 @@ function Home() {
         fetch('/api/terms')
             .then(res => res.json())
             .then(data => {
-                setTerms(data)
-                setLoading(false)
+                if (Array.isArray(data)) {
+                    setTerms(data)
+                    setLoading(false)
+                } else {
+                    console.error("API Error - Expected Array, got:", data);
+                    // Handle "No Token" or "Permissions" error gracefully
+                    setTerms([]);
+                    setLoading(false);
+                    // Optional: You could set an error state here to show UI feedback
+                }
 
                 if (data.length > 0) {
                     // Check for saved term of the day
