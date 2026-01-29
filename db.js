@@ -1,5 +1,4 @@
-import pkg from 'pg';
-const { Pool } = pkg;
+// PG import removed in favor of createRequire below
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -19,6 +18,7 @@ if (isPostgres) {
     console.log("DB URL Length:", process.env.DATABASE_URL ? process.env.DATABASE_URL.length : 'MISSING');
 
     try {
+        const { Pool } = require('pg');
         pool = new Pool({
             connectionString: process.env.DATABASE_URL,
             ssl: {
