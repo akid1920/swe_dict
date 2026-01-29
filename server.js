@@ -155,9 +155,16 @@ app.delete('/api/terms/:id', checkAuth, async (req, res) => {
 // LOGIN check
 app.post('/api/login', (req, res) => {
     const { password } = req.body;
+    console.log("Login attempt received.");
+    // Do NOT log the actual password in production for security, but we can log lengths or a masked version for debugging if needed.
+    // console.log(`Received password length: ${password ? password.length : 0}`);
+    // console.log(`Expected password length: ${ADMIN_PASSWORD ? ADMIN_PASSWORD.length : 0}`);
+
     if (password === ADMIN_PASSWORD) {
+        console.log("Login successful.");
         res.json({ success: true });
     } else {
+        console.log("Login failed: Password mismatch.");
         res.status(401).json({ error: 'Invalid password' });
     }
 });
