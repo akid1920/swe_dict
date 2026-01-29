@@ -1,9 +1,10 @@
-import sqlite3 from 'sqlite3';
 import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
+const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -34,7 +35,12 @@ if (isPostgres) {
 } else {
     console.log("Using local SQLite database.");
     const DB_FILE = path.join(__dirname, 'swes.db');
-    db = new sqlite3.Database(DB_FILE);
+    try {
+        const sqlite3 = require('sqlite3');
+        db = new sqlite3.Database(DB_FILE);
+    } catch (e) {
+        console.error("Failed to load sqlite3 locally", e);
+    }
 }
 
 // Helper to convert '?' params to '$1, $2' for Postgres
@@ -48,10 +54,12 @@ const database = {
     // Run a query that returns multiple rows
     all: async (sql, params = []) => {
         if (isPostgres) {
+            if (!pool) throw new Error("Database pool not initialized");
             const res = await pool.query(convertQuery(sql), params);
             return res.rows;
         } else {
             return new Promise((resolve, reject) => {
+                if (!db) return reject(new Error("SQLite DB not initialized"));
                 db.all(sql, params, (err, rows) => {
                     if (err) reject(err);
                     else resolve(rows);
@@ -63,10 +71,12 @@ const database = {
     // Run a query that returns a single row or null
     get: async (sql, params = []) => {
         if (isPostgres) {
+            if (!pool) throw new Error("Database pool not initialized");
             const res = await pool.query(convertQuery(sql), params);
             return res.rows[0];
         } else {
             return new Promise((resolve, reject) => {
+                if (!db) return reject(new Error("SQLite DB not initialized"));
                 db.get(sql, params, (err, row) => {
                     if (err) reject(err);
                     else resolve(row);
@@ -79,6 +89,7 @@ const database = {
     // Returns { id: number, changes: number }
     run: async (sql, params = []) => {
         if (isPostgres) {
+            if (!pool) throw new Error("Database pool not initialized");
             // Postgres doesn't return lastID automatically like SQLite
             // We need to append RETURNING id if it's an INSERT
             let pSql = convertQuery(sql);
@@ -96,6 +107,7 @@ const database = {
             };
         } else {
             return new Promise((resolve, reject) => {
+                if (!db) return reject(new Error("SQLite DB not initialized"));
                 db.run(sql, params, function (err) {
                     if (err) reject(err);
                     else resolve({ id: this.lastID, changes: this.changes });
@@ -128,10 +140,7 @@ const database = {
         await database.run(createTableSql);
         console.log("Database initialized.");
 
-        // Check if migration needed (add column)
-        // Simplified check: select one row, see if formula_description exists
-        // Or just try to ADD COLUMN and ignore error
-        // A better cross-db way:
+        // Migration: try to add column if missing
         try {
             await database.run("ALTER TABLE terms ADD COLUMN formula_description TEXT");
             console.log("Migration: Added formula_description column.");
