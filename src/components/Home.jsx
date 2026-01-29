@@ -255,7 +255,6 @@ function Home() {
                             <div className="results-container">
                                 <h2 className="results-header">
                                     {searchTerm ? `Results for "${searchTerm}"` : `Category: ${selectedCategory}`}
-                                    <span className="results-count">({filteredTerms.length} terms)</span>
                                 </h2>
                                 <div className="terms-grid">
                                     {filteredTerms.length > 0 ? (
