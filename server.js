@@ -5,7 +5,12 @@ import bodyParser from 'body-parser';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import db from './db.js';
+// import db from './db.js';
+const db = {
+    init: async () => { },
+    all: async () => [],
+    run: async () => ({})
+}; // MOCK DB FOR DIAGNOSTICS
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -187,7 +192,8 @@ if (fs.existsSync(distPath)) {
     });
 }
 
-if (process.env.NODE_ENV !== 'production') {
+// Only listen if NOT in Vercel
+if (!process.env.VERCEL) {
     app.listen(PORT, () => {
         console.log(`Server running on http://localhost:${PORT}`);
     });
