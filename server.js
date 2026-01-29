@@ -19,20 +19,21 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
 
 // Initialize Database
-db.init().then(async () => {
-    // Auto-Migration: Check if empty
-    try {
-        const row = await db.get("SELECT count(*) as count FROM terms");
-        if (row && (row.count === 0 || row.count === '0')) {
-            console.log("Database empty. Migrating from JSON...");
-            migrateJsonData();
-        }
-    } catch (e) {
-        console.error("Error checking db count", e);
-    }
-}).catch(err => {
-    console.error("CRITICAL: Database initialization failed", err);
-});
+console.log("Starting DB Init...");
+// db.init().then(async () => {
+//     // Auto-Migration: Check if empty
+//     try {
+//         const row = await db.get("SELECT count(*) as count FROM terms");
+//         if (row && (row.count === 0 || row.count === '0')) {
+//             console.log("Database empty. Migrating from JSON...");
+//             migrateJsonData();
+//         }
+//     } catch (e) {
+//         console.error("Error checking db count", e);
+//     }
+// }).catch(err => {
+//     console.error("CRITICAL: Database initialization failed", err);
+// });
 
 async function migrateJsonData() {
     if (fs.existsSync(JSON_DATA_FILE)) {
