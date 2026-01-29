@@ -36,7 +36,8 @@ if (isPostgres) {
     console.log("Using local SQLite database.");
     const DB_FILE = path.join(__dirname, 'swes.db');
     try {
-        const sqlite3 = require('sqlite3');
+        const sqModule = 'sqlite3';
+        const sqlite3 = require(sqModule);
         db = new sqlite3.Database(DB_FILE);
     } catch (e) {
         console.error("Failed to load sqlite3 locally", e);
