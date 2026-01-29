@@ -34,15 +34,16 @@ if (isPostgres) {
         console.error("FAILED TO INITIALIZE POOL:", err);
     }
 } else {
-    console.log("Using local SQLite database.");
-    const DB_FILE = path.join(__dirname, 'swes.db');
-    try {
-        const sqModule = 'sqlite3';
-        const sqlite3 = require(sqModule);
-        db = new sqlite3.Database(DB_FILE);
-    } catch (e) {
-        console.error("Failed to load sqlite3 locally", e);
-    }
+    // FALLBACK: Do NOT try to load sqlite3 on Vercel. 
+    // It causes crashes if the native module is missing (which it is, in devDeps).
+    console.warn("WARNING: No DATABASE_URL found. Running in headless mode (No DB).");
+    const noDbError = () => Promise.reject(new Error("Database connection not configured (DATABASE_URL missing)."));
+
+    db = {
+        all: noDbError,
+        get: noDbError,
+        run: noDbError
+    };
 }
 
 // Helper to convert '?' params to '$1, $2' for Postgres
