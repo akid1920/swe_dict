@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JSON_DATA_FILE = path.join(__dirname, 'src', 'data', 'terms.json');
-const ADMIN_PASSWORD = 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
