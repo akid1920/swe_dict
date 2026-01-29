@@ -83,7 +83,8 @@ body {
   .back-button {
     position: static;
     margin-bottom: 1rem;
-    align-self: flex-start;
+    align-self: center;
+    margin-top: 1.5rem;
   }
 }
 
