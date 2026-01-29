@@ -18,11 +18,13 @@ const AdminLogin = () => {
             if (res.ok) {
                 localStorage.setItem('adminPass', password);
                 navigate('/admin/dashboard');
-            } else {
+            } else if (res.status === 401) {
                 setError('Invalid Password');
+            } else {
+                setError(`Server Error: ${res.status}`);
             }
         } catch (err) {
-            setError('Login failed');
+            setError('Network Error or Server Unreachable');
         }
     };
 
