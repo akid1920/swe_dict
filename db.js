@@ -14,12 +14,23 @@ let pool;
 
 if (isPostgres) {
     console.log("Using PostgreSQL database.");
-    pool = new pg.Pool({
-        connectionString: process.env.DATABASE_URL,
-        ssl: {
-            rejectUnauthorized: false
-        }
-    });
+    console.log("DB URL Length:", process.env.DATABASE_URL ? process.env.DATABASE_URL.length : 'MISSING');
+
+    try {
+        pool = new pg.Pool({
+            connectionString: process.env.DATABASE_URL,
+            ssl: {
+                rejectUnauthorized: false
+            }
+        });
+
+        // Test connection immediately to fail fast
+        pool.on('error', (err) => {
+            console.error('Unexpected error on idle client', err);
+        });
+    } catch (err) {
+        console.error("FAILED TO INITIALIZE POOL:", err);
+    }
 } else {
     console.log("Using local SQLite database.");
     const DB_FILE = path.join(__dirname, 'swes.db');
